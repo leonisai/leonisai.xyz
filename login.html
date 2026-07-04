@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leonis AI — Login</title>
+    <link rel="icon" type="image/png" href="./IMG_6805.PNG">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <style>
+        /* ─── CSS VARIABLES (identical to landing) ─── */
+        :root {
+            --ink: #09090b;
+            --ink-2: #18181b;
+            --ink-3: #27272a;
+            --muted: #71717a;
+            --muted-2: #a1a1aa;
+            --wire: #e4e4e7;
+            --wire-2: #f4f4f5;
+            --surface: #fafafa;
+            --white: #ffffff;
+
+            --blue: #2563eb;
+            --blue-dim: #eff6ff;
+            --blue-mid: #bfdbfe;
+            --violet: #7c3aed;
+            --violet-dim: #f5f3ff;
+
+            --grad-hero: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            --grad-text: linear-gradient(135deg, #09090b 0%, #2563eb 60%, #7c3aed 100%);
+
+            --r-sm: 10px;
+            --r-md: 16px;
+            --r-lg: 24px;
+            --r-xl: 32px;
+
+            --font-display: 'Syne', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'DM Mono', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--surface);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* noise texture (identical to landing) */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ─── TOP NAV (matches chat.html flat nav) ─── */
+        nav {
+            flex-shrink: 0;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--wire);
+            position: relative;
+            z-index: 5;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: 1.05rem;
+            color: var(--ink);
+            text-decoration: none;
+        }
+        .logo img { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; }
+        .nav-back {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 7px 16px;
+            border-radius: 100px;
+            transition: all 0.2s;
+        }
+        .nav-back:hover { color: var(--ink); background: var(--wire-2); }
+
+        /* ─── AMBIENT BACKGROUND (matches hero) ─── */
+        .auth-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 20px 64px;
+            overflow: hidden;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .orb-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(37,99,235,0.15) 0%, transparent 70%);
+            top: -120px; left: -80px;
+            animation: orbFloat1 18s ease-in-out infinite;
+        }
+        .orb-2 {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+            bottom: -100px; right: -60px;
+            animation: orbFloat2 22s ease-in-out infinite;
+        }
+        @keyframes orbFloat1 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(40px, 30px) scale(1.05); }
+            66% { transform: translate(-20px, 50px) scale(0.95); }
+        }
+        @keyframes orbFloat2 {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(-60px, -40px) scale(1.08); }
+        }
+        .dots {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px);
+            background-size: 28px 28px;
+            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 100%);
+            mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 100%);
+            pointer-events: none;
+        }
+
+        /* ─── AUTH CARD ─── */
+        .auth-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 440px;
+            background: var(--white);
+            border: 1px solid var(--wire);
+            border-radius: var(--r-xl);
+            padding: 40px 36px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.07);
+            animation: fadeUp 0.7s ease-out both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            background: var(--blue-dim);
+            border: 1px solid var(--blue-mid);
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--blue);
+            margin-bottom: 22px;
+        }
+        .auth-badge .dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--grad-hero);
+        }
+
+        .auth-title {
+            font-family: var(--font-display);
+            font-size: 1.9rem;
+            line-height: 1.15;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+        }
+        .auth-title span {
+            background: var(--grad-text);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .auth-desc {
+            font-size: 0.925rem;
+            color: var(--muted);
+            line-height: 1.65;
+            font-weight: 300;
+            margin-bottom: 28px;
+        }
+
+        .section-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.09em;
+            color: var(--muted-2);
+            margin-bottom: 12px;
+        }
+
+        /* wallet login preview row */
+        .wallet-preview {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: var(--surface);
+            border: 1px solid var(--wire);
+            border-radius: var(--r-md);
+            margin-bottom: 12px;
+            transition: all 0.25s;
+        }
+        .wallet-preview:hover {
+            border-color: var(--blue-mid);
+            box-shadow: 0 8px 24px rgba(37,99,235,0.06);
+        }
+        .wallet-preview-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--r-sm);
+            background: var(--grad-hero);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.35rem;
+            flex-shrink: 0;
+            box-shadow: 0 6px 18px rgba(37,99,235,0.2);
+        }
+        .wallet-preview-body { flex: 1; min-width: 0; }
+        .wallet-preview-title {
+            font-family: var(--font-display);
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: -0.01em;
+        }
+        .wallet-preview-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+        .auth-hint {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: var(--muted);
+            line-height: 1.55;
+            margin: 6px 2px 26px;
+        }
+        .auth-hint svg { flex-shrink: 0; margin-top: 1px; }
+
+        /* buttons (identical to landing) */
+        .btn-primary {
+            background: var(--grad-hero);
+            color: white;
+            border: none;
+            padding: 14px 26px;
+            border-radius: 100px;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s;
+            text-decoration: none;
+            white-space: nowrap;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37,99,235,0.25);
+        }
+
+        .auth-alt {
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-top: 20px;
+        }
+        .auth-alt a { color: var(--blue); font-weight: 600; text-decoration: none; }
+        .auth-alt a:hover { text-decoration: underline; }
+
+        .auth-legal {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--muted-2);
+            line-height: 1.6;
+            margin-top: 22px;
+        }
+        .auth-legal a { color: var(--muted); text-decoration: none; }
+        .auth-legal a:hover { color: var(--ink); }
+
+        @media (max-width: 480px) {
+            .auth-card { padding: 32px 22px; border-radius: var(--r-lg); }
+            .auth-title { font-size: 1.65rem; }
+            nav { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="./index.html" class="logo">
+        <img src="./IMG_6805.PNG" alt="Leonis AI">
+        Leonis AI
+    </a>
+    <a href="./index.html" class="nav-back">← Back to site</a>
+</nav>
+
+<div class="auth-stage">
+    <div class="dots"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="auth-card">
+        <div class="auth-badge"><span class="dot"></span> Secure Web3 Login</div>
+
+        <h1 class="auth-title">Welcome to <span>Leonis&nbsp;AI</span></h1>
+        <p class="auth-desc">
+            Sign in with your wallet to access the Leonis dashboard — generate,
+            audit, and prepare on-chain transactions with AI.
+        </p>
+
+        <div class="section-label">Wallet Login</div>
+
+        <a href="./wallet.html" class="wallet-preview" id="walletPreview" style="text-decoration:none;color:inherit;">
+            <div class="wallet-preview-icon">👛</div>
+            <div class="wallet-preview-body">
+                <div class="wallet-preview-title" id="wpTitle">Connect a wallet</div>
+                <div class="wallet-preview-sub" id="wpSub">MetaMask · WalletConnect · Coinbase</div>
+            </div>
+        </a>
+
+        <div class="auth-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#71717a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Non-custodial — Leonis never stores your keys or seed phrase. You approve every action in your own wallet.
+        </div>
+
+        <a href="./wallet.html" class="btn-primary" id="continueBtn">Continue →</a>
+
+        <div class="auth-alt">
+            New to Web3 wallets? <a href="https://ethereum.org/en/wallets/" target="_blank" rel="noopener">Learn more</a>
+        </div>
+
+        <div class="auth-legal">
+            By continuing you agree to our <a href="./index.html#">Terms</a> and <a href="./index.html#">Privacy Policy</a>.
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { Leonis } from './leonis-web3.js';
+// If a valid signed session exists and the wallet can be reconnected, offer the app directly.
+(async () => {
+    if (!Leonis.isAuthenticated()) return;
+    const sess = Leonis.getSession();
+    const st = await Leonis.eagerReconnect();
+    if (st) {
+        document.getElementById('continueBtn').setAttribute('href', './app.html');
+        document.getElementById('continueBtn').textContent = 'Continue to app →';
+        document.getElementById('walletPreview').setAttribute('href', './app.html');
+        document.getElementById('wpTitle').textContent = 'Signed in';
+        document.getElementById('wpSub').textContent = (sess.provider || 'Wallet') + ' · ' + Leonis.shortAddr(st.address);
+    }
+})();
+</script>
+
+</body>
+</html>
